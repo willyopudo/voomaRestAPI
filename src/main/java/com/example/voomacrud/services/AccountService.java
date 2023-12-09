@@ -1,9 +1,13 @@
 package com.example.voomacrud.services;
 
+import com.example.voomacrud.dto.AccountCardsDto;
+import com.example.voomacrud.dto.CardDto;
 import com.example.voomacrud.entity.Account;
+import com.example.voomacrud.entity.Card;
 import com.example.voomacrud.repository.AccountRepository;
 import com.example.voomacrud.repository.AccountRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,9 +19,12 @@ import java.util.Optional;
 public class AccountService {
     private final AccountRepository accountRepository;
 
-    public AccountService(AccountRepository accountRepository) {
+    private final CardService cardService;
+
+    public AccountService(AccountRepository accountRepository, CardService cardService) {
 
             this.accountRepository = accountRepository;
+            this.cardService = cardService;
     }
 
     public ResponseEntity<Account> saveAccount(Account account) {
@@ -35,6 +42,26 @@ public class AccountService {
             return ResponseEntity.ok(account);
         else
             return ResponseEntity.notFound().build();
+    }
+
+    public AccountCardsDto findAccountWithCards(Long accountId) {
+        var account = accountRepository.findById(accountId)
+                .orElse(
+                        Account.builder()
+                                .id(0L)
+                                .iban("NOT_FOUND")
+                                .bankCode("NOT_FOUND")
+                                .customerId(0)
+                                .build()
+                );
+        Optional<List<CardDto>> cards = cardService.findAllCardsByAccountId(accountId);
+
+        return AccountCardsDto.builder()
+                .iban(account.getIban())
+                .bankCode(account.getBankCode())
+                .customerId(account.getCustomerId())
+                .cards(cards)
+                .build();
     }
 //    public ResponseEntity<Account> updateAccount(Long id, Account updatedAccount){
 //        if (id == null) {

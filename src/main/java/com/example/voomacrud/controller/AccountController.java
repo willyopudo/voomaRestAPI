@@ -1,5 +1,6 @@
 package com.example.voomacrud.controller;
 
+import com.example.voomacrud.dto.AccountCardsDto;
 import com.example.voomacrud.entity.Account;
 import com.example.voomacrud.services.AccountService;
 import lombok.RequiredArgsConstructor;
@@ -43,12 +44,18 @@ public class AccountController {
             return ResponseEntity.notFound().build();
         }
     }
+    @GetMapping("/account-cards/{accountId}")
+    public ResponseEntity<AccountCardsDto> findAllCardsByAccount(
+            @PathVariable("accountId") Long accountId
+    ) {
+        return ResponseEntity.ok(accountService.findAccountWithCards(accountId));
+    }
 
     // Update a account
 //    @PutMapping(path = "/account/{accountId}")
 //    public ResponseEntity<Account> updateAccount(@PathVariable(value = "accountId") Long accountId, @RequestBody Account account)
 //    {
-//        return accountService.updaateAccount(accountId,account);
+//        return accountService.updateAccount(accountId,account);
 //    }
 
     //Delete a account
@@ -57,5 +64,7 @@ public class AccountController {
         return accountService.deleteAccount(accountId);
 
     }
+
+
 
 }

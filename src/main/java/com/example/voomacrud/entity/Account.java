@@ -8,6 +8,7 @@ import lombok.*;
 @Entity
 @AllArgsConstructor
 @RequiredArgsConstructor
+@Builder
 @Table(name = "accounts")
 public class Account {
     @Id

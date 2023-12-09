@@ -1,5 +1,6 @@
 package com.example.voomacrud.services;
 
+import com.example.voomacrud.dto.CardDto;
 import com.example.voomacrud.entity.Card;
 import com.example.voomacrud.repository.CardRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -10,14 +11,18 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class CardService {
     @Autowired
     private final CardRepository cardRepository;
 
+
     public CardService(CardRepository cardRepository) {
 
         this.cardRepository = cardRepository;
+
     }
 
     public ResponseEntity<Card> saveCard(Card card) {
@@ -42,9 +47,9 @@ public class CardService {
         }
         if(!Objects.equals(updatedCard.getId(), id))
             return ResponseEntity.status(400).build();
-        Card Existingcard = cardRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.valueOf(id)));
-        Existingcard.setCardAlias(updatedCard.getCardAlias());
-        Card savedEntity = cardRepository.save(Existingcard);
+        Card ExistingCard = cardRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.valueOf(id)));
+        ExistingCard.setCardAlias(updatedCard.getCardAlias());
+        Card savedEntity = cardRepository.save(ExistingCard);
         return ResponseEntity.ok(savedEntity);
     }
 
@@ -57,4 +62,26 @@ public class CardService {
         else
             return ResponseEntity.notFound().build();
     }
+
+	public Optional<List<CardDto>> findAllCardsByAccountId(Long accountId) {
+		return cardListToDto(cardRepository.findAllByAccountId(accountId));
+
+	}
+    private CardDto cardToCardDto(Card card){
+        CardDto cardDto = new CardDto();
+        cardDto.setId(card.getId());
+        cardDto.setCardAlias(card.getCardAlias());
+        cardDto.setCardType(card.getCardType());
+        cardDto.setAccountId(card.getAccount().getId());
+
+        return cardDto;
+    }
+
+    private Optional<List<CardDto>> cardListToDto(List<Card> cards){
+        return Optional.of(cards.stream().map(
+		        this::cardToCardDto).collect(Collectors.toList()));
+
+    }
+
+
 }

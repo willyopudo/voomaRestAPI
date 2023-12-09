@@ -14,10 +14,10 @@ import java.util.List;
 @Configuration
 public class OpenApiConfig {
 
-    @Value("${boot.productapi.openapi.dev-url}")
+    @Value("${boot.voomaapi.openapi.dev-url}")
     private String devUrl;
 
-    @Value("${boot.productapi.openapi.prod-url}")
+    @Value("${boot.voomaapi.openapi.prod-url}")
     private String prodUrl;
 
     @Bean
