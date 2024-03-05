@@ -5,6 +5,9 @@ import com.example.voomacrud.entity.Card;
 import com.example.voomacrud.repository.CardRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +33,9 @@ public class CardService {
         return ResponseEntity.ok(newCard);
     }
     // Get all cards
-    public ResponseEntity<List<Card>> fetchAllCards() {
-        return ResponseEntity.ok(cardRepository.findAll());
+    public Page<Card> fetchAllCards(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return cardRepository.findAll(pageable);
     }
 
     public ResponseEntity<Optional<Card>> fetchCardById(Long id){

@@ -4,6 +4,7 @@ import com.example.voomacrud.entity.Card;
 import com.example.voomacrud.services.CardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,18 +29,15 @@ public class CardController {
 
     // Get all cards
     @GetMapping("/card")
-    public ResponseEntity<List<Card>> getAllCards() {
-        return cardService.fetchAllCards();
+    public ResponseEntity<Page<Card>> getAllCards(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "4") int pageSize) {
+        Page<Card> cards = cardService.fetchAllCards(pageNo, pageSize);
+        return ResponseEntity.ok(cards);
     }
     // Get a card by ID
     @GetMapping("/card/{id}")
     public ResponseEntity<Optional<Card>> getCardById(@PathVariable Long id) {
         ResponseEntity<Optional<Card>> card = cardService.fetchCardById(id);
-        if (card != null) {
-            return card;
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return Objects.requireNonNullElseGet(card, () -> ResponseEntity.notFound().build());
     }
 
      //Update Card
