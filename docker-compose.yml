@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.8"
 services:
   api_service:
     build: .
@@ -8,7 +8,8 @@ services:
     networks:
       - voomaapi-net
     environment:
-      - spring.datasource.url=jdbc:mysql://mysqldb:3306/vooma_db?allowPublicKeyRetrieval=true
+      - MYSQL_USER=wilfusr
+      - MYSQL_PASSWORD=wilfpassword
     depends_on:
       - mysqldb
 
@@ -20,6 +21,8 @@ services:
     restart: always
     ports:
       - 3307:3306
+    volumes:
+      - mysql_data:/var/lib/mysql
     networks:
       - voomaapi-net
     environment:
@@ -30,3 +33,6 @@ services:
 networks:
   voomaapi-net:
     name: voomaapi-net
+volumes:
+  mysql_data:
+  .m2:
