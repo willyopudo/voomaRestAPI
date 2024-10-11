@@ -73,6 +73,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>vooma_crud_api</finalName>
 	</build>
 
 </project>
