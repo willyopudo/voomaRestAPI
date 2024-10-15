@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/accounts")
 @RequiredArgsConstructor
 public class AccountController {
     @Autowired
@@ -22,7 +22,7 @@ public class AccountController {
     //private ModelMapper modelMapper;
 
     // Create a new account
-    @PostMapping("/account")
+    @PostMapping
     public ResponseEntity<Account> saveAccount(@RequestBody Account account) {
         ResponseEntity<Account> newAccount = accountService.saveAccount(account);
         URI uri = URI.create("/account/" + Objects.requireNonNull(newAccount.getBody()).getId());
@@ -30,12 +30,12 @@ public class AccountController {
     }
 
     // Get all accounts
-    @GetMapping("/account")
+    @GetMapping
     public ResponseEntity<List<Account>> getAllAccounts() {
         return accountService.fetchAllAccounts();
     }
     // Get a account by ID
-    @GetMapping("/account/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Optional<Account>> getAccountById(@PathVariable Long id) {
         ResponseEntity<Optional<Account>> account = accountService.fetchAccountById(id);
         if (account != null) {
@@ -44,7 +44,7 @@ public class AccountController {
             return ResponseEntity.notFound().build();
         }
     }
-    @GetMapping("/account-cards/{accountId}")
+    @GetMapping("/cards/{accountId}")
     public ResponseEntity<AccountCardsDto> findAllCardsByAccount(
             @PathVariable("accountId") Long accountId
     ) {
@@ -59,7 +59,7 @@ public class AccountController {
 //    }
 
     //Delete a account
-    @DeleteMapping(value = "/account/{accountId}")
+    @DeleteMapping(value = "{accountId}")
     public ResponseEntity<String> deleteAccount(@PathVariable Long accountId) {
         return accountService.deleteAccount(accountId);
 
