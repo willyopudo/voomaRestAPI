@@ -4,7 +4,7 @@ start=$(date +"%s")
 
 ssh -p ${SERVER_PORT} ${SERVER_USER}@${SERVER_HOST} -i key.txt -t -t -o StrictHostKeyChecking=no << 'ENDSSH'
 
-#docker run -d --rm -p 8000:8000 --name $CONTAINER_NAME willyf02/voomacrud:latest
+cd /opt/voomacrud-test
 docker compose pull && docker compose up -d
 
 exit
