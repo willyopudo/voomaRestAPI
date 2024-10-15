@@ -33,7 +33,7 @@ public class OpenApiConfig {
         Contact contact = new Contact();
         contact.setEmail("wilfred@gmail.com");
         contact.setName("Wilfred");
-        contact.setUrl("https://www.willyf.com");
+        contact.setUrl("https://www.willyf.io");
 
         License mitLicense = new License().name("MIT License").url("https://choosealicense.com/licenses/mit/");
 
