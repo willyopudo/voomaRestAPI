@@ -10,6 +10,11 @@ services:
       - voomaapi-net
     depends_on:
       - mysqldb
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/vooma_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${VOOMA_DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${VOOMA_DB_PASSWORD}
+      - BOOT_VOOMAAPI_OPENAPI_DEV_URL=${VOOMA_OPENAPI_DEV_URL}
 
   mysqldb:
     image: "mysql:8.0"
@@ -22,9 +27,9 @@ services:
       - voomaapi-net
     environment:
       MYSQL_DATABASE: vooma_db
-      MYSQL_USER: wilfusr
-      MYSQL_PASSWORD: wilfpassword
-      MYSQL_ROOT_PASSWORD: wilfpassword
+      MYSQL_USER: ${VOOMA_DB_USERNAME}
+      MYSQL_PASSWORD: ${VOOMA_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${VOOMA_DB_PASSWORD}
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "mysqldb", "-u", "root", "-p$${MYSQL_ROOT_PASSWORD}" ]
       timeout: 20s
