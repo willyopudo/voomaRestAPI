@@ -1,6 +1,7 @@
 package com.example.voomacrud.services;
 
 import com.example.voomacrud.dto.AccountCardsDto;
+import com.example.voomacrud.dto.AccountDto;
 import com.example.voomacrud.dto.CardDto;
 import com.example.voomacrud.entity.Account;
 import com.example.voomacrud.entity.Card;
@@ -12,9 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class AccountService {
     private final AccountRepository accountRepository;
@@ -27,19 +31,19 @@ public class AccountService {
             this.cardService = cardService;
     }
 
-    public ResponseEntity<Account> saveAccount(Account account) {
+    public ResponseEntity<AccountDto> saveAccount(Account account) {
         Account newAccount = accountRepository.save(account);
-        return ResponseEntity.ok(newAccount);
+        return ResponseEntity.ok(accountToAccountDto(newAccount));
     }
     // Get all accounts
-    public ResponseEntity<List<Account>> fetchAllAccounts() {
-        return ResponseEntity.ok(accountRepository.findAll());
+    public ResponseEntity<List<AccountDto>> fetchAllAccounts() {
+        return ResponseEntity.ok(accountListToDto(accountRepository.findAll()).orElse(new ArrayList<>()));
     }
 
-    public ResponseEntity<Optional<Account>> fetchAccountById(Long id){
-        Optional<Account> account = accountRepository.findById(id);
-        if(account.isPresent())
-            return ResponseEntity.ok(account);
+    public ResponseEntity<AccountDto> fetchAccountById(Long id){
+        Account account = accountRepository.findById(id).orElse(null);
+        if(account != null)
+            return ResponseEntity.ok(accountToAccountDto(account));
         else
             return ResponseEntity.notFound().build();
     }
@@ -78,5 +82,21 @@ public class AccountService {
         }
         else
             return ResponseEntity.notFound().build();
+    }
+
+    private AccountDto accountToAccountDto(Account account){
+        AccountDto accountDto = new AccountDto();
+        accountDto.setId(account.getId());
+        accountDto.setIban(account.getIban());
+        accountDto.setBankCode(account.getBankCode());
+        accountDto.setCustomerId(account.getCustomerId());
+
+        return accountDto;
+    }
+
+    private Optional<List<AccountDto>> accountListToDto(List<Account> accounts){
+        return Optional.of(accounts.stream().map(
+                this::accountToAccountDto).collect(Collectors.toList()));
+
     }
 }

@@ -6,6 +6,7 @@ import com.example.voomacrud.repository.CardRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +34,9 @@ public class CardService {
         return ResponseEntity.ok(newCard);
     }
     // Get all cards
-    public Page<Card> fetchAllCards(int pageNo, int pageSize) {
+    public Page<CardDto> fetchAllCards(int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        return cardRepository.findAll(pageable);
+        return cardRepository.findAll(pageable).map(CardDto::new);
     }
 
     public ResponseEntity<Optional<Card>> fetchCardById(Long id){

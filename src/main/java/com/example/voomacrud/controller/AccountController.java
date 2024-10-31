@@ -1,6 +1,7 @@
 package com.example.voomacrud.controller;
 
 import com.example.voomacrud.dto.AccountCardsDto;
+import com.example.voomacrud.dto.AccountDto;
 import com.example.voomacrud.entity.Account;
 import com.example.voomacrud.services.AccountService;
 import lombok.RequiredArgsConstructor;
@@ -23,30 +24,26 @@ public class AccountController {
 
     // Create a new account
     @PostMapping
-    public ResponseEntity<Account> saveAccount(@RequestBody Account account) {
-        ResponseEntity<Account> newAccount = accountService.saveAccount(account);
-        URI uri = URI.create("/account/" + Objects.requireNonNull(newAccount.getBody()).getId());
+    public ResponseEntity<AccountDto> saveAccount(@RequestBody Account account) {
+        ResponseEntity<AccountDto> newAccount = accountService.saveAccount(account);
+        URI uri = URI.create("/" + Objects.requireNonNull(newAccount.getBody()).getId());
         return ResponseEntity.created(uri).body(newAccount.getBody());
     }
 
     // Get all accounts
     @GetMapping
-    public ResponseEntity<List<Account>> getAllAccounts() {
+    public ResponseEntity<List<AccountDto>> getAllAccounts() {
         return accountService.fetchAllAccounts();
     }
     // Get a account by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Account>> getAccountById(@PathVariable Long id) {
-        ResponseEntity<Optional<Account>> account = accountService.fetchAccountById(id);
-        if (account != null) {
-            return account;
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<AccountDto> getAccountById(@PathVariable Long id) {
+        ResponseEntity<AccountDto> account = accountService.fetchAccountById(id);
+        return Objects.requireNonNullElseGet(account, () -> ResponseEntity.notFound().build());
     }
-    @GetMapping("/cards/{accountId}")
+    @GetMapping("/{id}/cards")
     public ResponseEntity<AccountCardsDto> findAllCardsByAccount(
-            @PathVariable("accountId") Long accountId
+            @PathVariable("id") Long accountId
     ) {
         return ResponseEntity.ok(accountService.findAccountWithCards(accountId));
     }
@@ -59,9 +56,9 @@ public class AccountController {
 //    }
 
     //Delete a account
-    @DeleteMapping(value = "{accountId}")
-    public ResponseEntity<String> deleteAccount(@PathVariable Long accountId) {
-        return accountService.deleteAccount(accountId);
+    @DeleteMapping(value = "{id}")
+    public ResponseEntity<String> deleteAccount(@PathVariable Long id) {
+        return accountService.deleteAccount(id);
 
     }
 
