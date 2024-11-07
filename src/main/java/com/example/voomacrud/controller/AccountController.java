@@ -6,6 +6,7 @@ import com.example.voomacrud.entity.Account;
 import com.example.voomacrud.services.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class AccountController {
 
     // Create a new account
     @PostMapping
-    public ResponseEntity<AccountDto> saveAccount(@RequestBody Account account) {
+    public ResponseEntity<AccountDto> saveAccount(@RequestBody AccountDto account) {
         ResponseEntity<AccountDto> newAccount = accountService.saveAccount(account);
         URI uri = URI.create("/" + Objects.requireNonNull(newAccount.getBody()).getId());
         return ResponseEntity.created(uri).body(newAccount.getBody());
@@ -48,12 +49,12 @@ public class AccountController {
         return ResponseEntity.ok(accountService.findAccountWithCards(accountId));
     }
 
-    // Update a account
-//    @PutMapping(path = "/account/{accountId}")
-//    public ResponseEntity<Account> updateAccount(@PathVariable(value = "accountId") Long accountId, @RequestBody Account account)
-//    {
-//        return accountService.updateAccount(accountId,account);
-//    }
+     //Update an account
+    @PutMapping("/{id}")
+    public ResponseEntity<AccountDto> updateAccount(@PathVariable("id") Long accountId, @RequestBody AccountDto account)
+    {
+        return accountService.updateAccount(account, accountId);
+    }
 
     //Delete a account
     @DeleteMapping(value = "{id}")

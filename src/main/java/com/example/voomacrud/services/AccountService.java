@@ -31,9 +31,22 @@ public class AccountService {
             this.cardService = cardService;
     }
 
-    public ResponseEntity<AccountDto> saveAccount(Account account) {
-        Account newAccount = accountRepository.save(account);
+    public ResponseEntity<AccountDto> saveAccount(AccountDto accountDto) {
+        Account newAccount = accountRepository.save(accountDtoToAccount(accountDto));
         return ResponseEntity.ok(accountToAccountDto(newAccount));
+    }
+
+    public ResponseEntity<AccountDto> updateAccount(AccountDto accountDto,long id) {
+        Account existingAccount = accountRepository.findById(id)
+                .orElseThrow(RuntimeException::new);
+
+        existingAccount.setIban(accountDto.getIban());
+        existingAccount.setBankCode(accountDto.getBankCode());
+        existingAccount.setCustomerId(accountDto.getCustomerId());
+
+
+        accountRepository.save(existingAccount);
+        return ResponseEntity.ok(accountToAccountDto(existingAccount));
     }
     // Get all accounts
     public ResponseEntity<List<AccountDto>> fetchAllAccounts() {
@@ -92,6 +105,16 @@ public class AccountService {
         accountDto.setCustomerId(account.getCustomerId());
 
         return accountDto;
+    }
+
+    private Account accountDtoToAccount(AccountDto accountDto){
+        Account account = new Account();
+        account.setId(accountDto.getId());
+        account.setIban(accountDto.getIban());
+        account.setBankCode(accountDto.getBankCode());
+        account.setCustomerId(accountDto.getCustomerId());
+
+        return account;
     }
 
     private Optional<List<AccountDto>> accountListToDto(List<Account> accounts){
