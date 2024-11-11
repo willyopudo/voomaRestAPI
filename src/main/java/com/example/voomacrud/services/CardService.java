@@ -2,6 +2,7 @@ package com.example.voomacrud.services;
 
 import com.example.voomacrud.dto.CardDto;
 import com.example.voomacrud.entity.Card;
+import com.example.voomacrud.repository.AccountRepository;
 import com.example.voomacrud.repository.CardRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 public class CardService {
     @Autowired
     private final CardRepository cardRepository;
+    @Autowired
+    private AccountRepository accountRepository;
 
 
     public CardService(CardRepository cardRepository) {
@@ -29,9 +32,9 @@ public class CardService {
 
     }
 
-    public ResponseEntity<Card> saveCard(Card card) {
-        Card newCard = cardRepository.save(card);
-        return ResponseEntity.ok(newCard);
+    public ResponseEntity<CardDto> saveCard(CardDto cardDto) {
+        Card newCard = cardRepository.save(cardDtoToCard(cardDto));
+        return ResponseEntity.ok(cardToCardDto(newCard));
     }
     // Get all cards
     public Page<CardDto> fetchAllCards(int pageNo, int pageSize) {
@@ -80,6 +83,15 @@ public class CardService {
         cardDto.setAccountId(card.getAccount().getId());
 
         return cardDto;
+    }
+
+    private Card cardDtoToCard(CardDto cardDto){
+        Card card = new Card();
+        card.setCardAlias(cardDto.getCardAlias());
+        card.setCardType(cardDto.getCardType());
+        card.setAccount(accountRepository.getReferenceById(cardDto.getAccountId()));
+
+        return card;
     }
 
     private Optional<List<CardDto>> cardListToDto(List<Card> cards){

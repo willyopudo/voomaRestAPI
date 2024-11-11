@@ -16,14 +16,15 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/cards")
+@CrossOrigin(origins = "http://localhost:3000")
 @RequiredArgsConstructor
 public class CardController {
     @Autowired
     private final CardService cardService;
     // Create a new card
     @PostMapping
-    public ResponseEntity<Card> saveCard(@RequestBody Card card) {
-        ResponseEntity<Card> newCard = cardService.saveCard(card);
+    public ResponseEntity<CardDto> addCard(@RequestBody CardDto cardDto) {
+        ResponseEntity<CardDto> newCard = cardService.saveCard(cardDto);
         URI uri = URI.create("/" + Objects.requireNonNull(newCard.getBody()).getId());
         return ResponseEntity.created(uri).body(newCard.getBody());
     }
