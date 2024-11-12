@@ -1,6 +1,7 @@
 package com.example.voomacrud.controller;
 
 import com.example.voomacrud.dto.CardDto;
+import com.example.voomacrud.dto.CardPostDto;
 import com.example.voomacrud.entity.Card;
 import com.example.voomacrud.services.CardService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class CardController {
     private final CardService cardService;
     // Create a new card
     @PostMapping
-    public ResponseEntity<CardDto> addCard(@RequestBody CardDto cardDto) {
+    public ResponseEntity<CardDto> addCard(@RequestBody CardPostDto cardDto) {
         ResponseEntity<CardDto> newCard = cardService.saveCard(cardDto);
         URI uri = URI.create("/" + Objects.requireNonNull(newCard.getBody()).getId());
         return ResponseEntity.created(uri).body(newCard.getBody());
@@ -37,14 +38,14 @@ public class CardController {
     }
     // Get a card by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Card>> getCardById(@PathVariable Long id) {
-        ResponseEntity<Optional<Card>> card = cardService.fetchCardById(id);
+    public ResponseEntity<Optional<CardDto>> getCardById(@PathVariable Long id) {
+        ResponseEntity<Optional<CardDto>> card = cardService.fetchCardById(id);
         return Objects.requireNonNullElseGet(card, () -> ResponseEntity.notFound().build());
     }
 
      //Update Card
     @PutMapping(path = "/{id}")
-    public ResponseEntity<Card> updateCard(@PathVariable(value = "id") Long id, @RequestBody Card card)
+    public ResponseEntity<CardDto> updateCard(@PathVariable(value = "id") Long id, @RequestBody CardDto card)
     {
         return cardService.updateCard(id,card);
     }

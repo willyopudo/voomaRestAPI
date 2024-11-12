@@ -1,7 +1,9 @@
 package com.example.voomacrud.services;
 
 import com.example.voomacrud.dto.CardDto;
+import com.example.voomacrud.dto.CardPostDto;
 import com.example.voomacrud.entity.Card;
+import com.example.voomacrud.enums.CardType;
 import com.example.voomacrud.repository.AccountRepository;
 import com.example.voomacrud.repository.CardRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -32,7 +34,7 @@ public class CardService {
 
     }
 
-    public ResponseEntity<CardDto> saveCard(CardDto cardDto) {
+    public ResponseEntity<CardDto> saveCard(CardPostDto cardDto) {
         Card newCard = cardRepository.save(cardDtoToCard(cardDto));
         return ResponseEntity.ok(cardToCardDto(newCard));
     }
@@ -42,23 +44,22 @@ public class CardService {
         return cardRepository.findAll(pageable).map(CardDto::new);
     }
 
-    public ResponseEntity<Optional<Card>> fetchCardById(Long id){
+    public ResponseEntity<Optional<CardDto>> fetchCardById(Long id){
         Optional<Card> card = cardRepository.findById(id);
-        if(card.isPresent())
-            return ResponseEntity.ok(card);
-        else
-            return ResponseEntity.notFound().build();
+        return card.map(value -> ResponseEntity.ok(Optional.of(cardToCardDto(value)))).orElseGet(() -> ResponseEntity.notFound().build());
     }
-    public ResponseEntity<Card> updateCard(Long id, Card updatedCard){
+    public ResponseEntity<CardDto> updateCard(Long id, CardDto updatedCard){
         if (id == null) {
             throw new IllegalArgumentException("ID cannot be null");
         }
         if(!Objects.equals(updatedCard.getId(), id))
             return ResponseEntity.status(400).build();
-        Card ExistingCard = cardRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.valueOf(id)));
-        ExistingCard.setCardAlias(updatedCard.getCardAlias());
-        Card savedEntity = cardRepository.save(ExistingCard);
-        return ResponseEntity.ok(savedEntity);
+        Card existingCard = cardRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(String.valueOf(id)));
+        existingCard.setCardAlias(updatedCard.getCardAlias());
+        existingCard.setCardType(updatedCard.getCardType().getIntVal());
+
+        Card savedEntity = cardRepository.save(existingCard);
+        return ResponseEntity.ok(cardToCardDto(savedEntity));
     }
 
     public ResponseEntity<String> deleteCard(Long id) {
@@ -79,17 +80,17 @@ public class CardService {
         CardDto cardDto = new CardDto();
         cardDto.setId(card.getId());
         cardDto.setCardAlias(card.getCardAlias());
-        cardDto.setCardType(card.getCardType());
-        cardDto.setAccountId(card.getAccount().getId());
+        cardDto.setCardType(CardType.getByIntValue(card.getCardType()) );
+        cardDto.setAccount(card.getAccount().getIban());
 
         return cardDto;
     }
 
-    private Card cardDtoToCard(CardDto cardDto){
+    private Card cardDtoToCard(CardPostDto cardDto){
         Card card = new Card();
         card.setCardAlias(cardDto.getCardAlias());
-        card.setCardType(cardDto.getCardType());
-        card.setAccount(accountRepository.getReferenceById(cardDto.getAccountId()));
+        card.setCardType(cardDto.getCardType().getIntVal());
+        card.setAccount(accountRepository.getReferenceById(cardDto.getAccount()));
 
         return card;
     }
