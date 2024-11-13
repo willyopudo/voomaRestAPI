@@ -32,7 +32,7 @@ public class AccountServiceUnitTests {
                 .id(1L)
                 .iban("10008456300")
                 .bankCode("BNK002")
-                .customerId(12)
+                .customer(12)
                 .build();
         accountResp = ResponseEntity.ok(accountDto);
 

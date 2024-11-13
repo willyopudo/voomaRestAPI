@@ -45,7 +45,7 @@ public class AccountControllerUnitTests {
                 .id(1L)
                 .iban("10008456300")
                 .bankCode("BNK002")
-                .customerId(12)
+                .customer(12)
                 .build();
         account = ResponseEntity.ok(accountDto);
     }
@@ -67,7 +67,7 @@ public class AccountControllerUnitTests {
                 andExpect(status().isCreated())
                 .andExpect(jsonPath("$.iban", is(account.getBody().getIban())))
                 .andExpect(jsonPath("$.bankCode", is(account.getBody().getBankCode())))
-                .andExpect(jsonPath("$.customerId", is(account.getBody().getCustomer())));
+                .andExpect(jsonPath("$.customer", is(account.getBody().getCustomer())));
     }
     //Get All Controller
     @Test
@@ -104,7 +104,7 @@ public class AccountControllerUnitTests {
                 .andDo(print())
                 .andExpect(jsonPath("$.iban", is(account.getBody().getIban())))
                 .andExpect(jsonPath("$.bankCode", is(account.getBody().getBankCode())))
-                .andExpect(jsonPath("$.customerId", is(account.getBody().getCustomer())));
+                .andExpect(jsonPath("$.customer", is(account.getBody().getCustomer())));
 
     }
 
