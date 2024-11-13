@@ -38,10 +38,10 @@ public class OpenApiConfig {
         License mitLicense = new License().name("MIT License").url("https://choosealicense.com/licenses/mit/");
 
         Info info = new Info()
-                .title("Demo Vooma OpenAPI for Card and Account Management API")
+                .title("Vooma APIs for Card and Account Management")
                 .version("1.0")
                 .contact(contact)
-                .description("This API exposes endpoints to manage products.").termsOfService("https://www.willyf.com/terms")
+                .description("This API exposes endpoints to manage accounts and associated cards.").termsOfService("https://www.willyf.com/terms")
                 .license(mitLicense);
 
         return new OpenAPI().info(info).servers(List.of(devServer, prodServer));

@@ -32,8 +32,8 @@ public class CardController {
 
     // Get all cards
     @GetMapping
-    public ResponseEntity<Page<CardDto>> getAllCards(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "4") int pageSize) {
-        Page<CardDto> cards = cardService.fetchAllCards(pageNo, pageSize);
+    public ResponseEntity<Page<CardDto>> getAllCards(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "4") int pageSize, @RequestParam(required = false) String cardType, @RequestParam(required = false) List<String> accounts) {
+        Page<CardDto> cards = cardService.fetchAllCards(pageNo, pageSize, cardType, accounts);
         return ResponseEntity.ok(cards);
     }
     // Get a card by ID

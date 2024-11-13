@@ -34,8 +34,8 @@ public class AccountController {
 
     // Get all accounts
     @GetMapping
-    public ResponseEntity<List<AccountDto>> getAllAccounts() {
-        return accountService.fetchAllAccounts();
+    public ResponseEntity<List<AccountDto>> getAllAccounts(@RequestParam(required = false) String ibanLike, @RequestParam(required = false) String cardType, @RequestParam(required = false) List<Integer> customers) {
+        return accountService.fetchAllAccounts(ibanLike, cardType, customers);
     }
     // Get a account by ID
     @GetMapping("/{id}")

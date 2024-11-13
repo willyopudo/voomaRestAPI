@@ -67,7 +67,7 @@ public class AccountControllerUnitTests {
                 andExpect(status().isCreated())
                 .andExpect(jsonPath("$.iban", is(account.getBody().getIban())))
                 .andExpect(jsonPath("$.bankCode", is(account.getBody().getBankCode())))
-                .andExpect(jsonPath("$.customerId", is(account.getBody().getCustomerId())));
+                .andExpect(jsonPath("$.customerId", is(account.getBody().getCustomer())));
     }
     //Get All Controller
     @Test
@@ -76,9 +76,9 @@ public class AccountControllerUnitTests {
         //Precondition
         List<AccountDto> accountList = new ArrayList<>();
         accountList.add(accountDto);
-        accountList.add(AccountDto.builder().id(2L).iban("100200300").bankCode("BNK003").customerId(20).build());
+        accountList.add(AccountDto.builder().id(2L).iban("100200300").bankCode("BNK003").customer(20).build());
 
-        given(accountService.fetchAllAccounts()).willReturn(ResponseEntity.ok(accountList));
+        given(accountService.fetchAllAccounts(null, null, null)).willReturn(ResponseEntity.ok(accountList));
 
         //action
         ResultActions response = mockMvc.perform(get("/api/v1/accounts"));
@@ -104,7 +104,7 @@ public class AccountControllerUnitTests {
                 .andDo(print())
                 .andExpect(jsonPath("$.iban", is(account.getBody().getIban())))
                 .andExpect(jsonPath("$.bankCode", is(account.getBody().getBankCode())))
-                .andExpect(jsonPath("$.customerId", is(account.getBody().getCustomerId())));
+                .andExpect(jsonPath("$.customerId", is(account.getBody().getCustomer())));
 
     }
 

@@ -3,6 +3,8 @@ package com.example.voomacrud.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -23,4 +25,7 @@ public class Account {
 
     @Column(nullable = false)
     private int customerId;
+
+    @OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
+    private List<Card> cards;
 }

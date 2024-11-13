@@ -5,13 +5,17 @@ import com.example.voomacrud.dto.AccountDto;
 import com.example.voomacrud.dto.CardDto;
 import com.example.voomacrud.entity.Account;
 import com.example.voomacrud.entity.Card;
+import com.example.voomacrud.mapper.CardMapper;
 import com.example.voomacrud.repository.AccountRepository;
 import com.example.voomacrud.repository.AccountRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,16 +23,21 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.example.voomacrud.util.specifications.AccountSpecification.*;
+
 @Service
 public class AccountService {
     private final AccountRepository accountRepository;
 
     private final CardService cardService;
 
-    public AccountService(AccountRepository accountRepository, CardService cardService) {
+    //private final CardMapper cardMapper;
 
-            this.accountRepository = accountRepository;
-            this.cardService = cardService;
+    @Autowired
+    public AccountService(AccountRepository accountRepository, CardService cardService) {
+        this.accountRepository = accountRepository;
+        this.cardService = cardService;
+        //this.cardMapper = cardMapper;
     }
 
     public ResponseEntity<AccountDto> saveAccount(AccountDto accountDto) {
@@ -42,15 +51,21 @@ public class AccountService {
 
         existingAccount.setIban(accountDto.getIban());
         existingAccount.setBankCode(accountDto.getBankCode());
-        existingAccount.setCustomerId(accountDto.getCustomerId());
+        existingAccount.setCustomerId(accountDto.getCustomer());
 
 
         accountRepository.save(existingAccount);
         return ResponseEntity.ok(accountToAccountDto(existingAccount));
     }
     // Get all accounts
-    public ResponseEntity<List<AccountDto>> fetchAllAccounts() {
-        return ResponseEntity.ok(accountListToDto(accountRepository.findAll()).orElse(new ArrayList<>()));
+    public ResponseEntity<List<AccountDto>> fetchAllAccounts(String ibanLikeFilter, String cardType, List<Integer> customers) {
+        // Only create specifications for fields with values:
+        Specification<Account> filters = Specification.where(StringUtils.isBlank(ibanLikeFilter) ? null : ibanLike(ibanLikeFilter))
+                .and(StringUtils.isBlank(cardType) ? null : hasCardsWithType(cardType))
+                .and(CollectionUtils.isEmpty(customers) ? null : withCustomer(customers));
+
+        // User our created Specification to query our repository
+        return ResponseEntity.ok(accountListToDto(accountRepository.findAll(filters)).orElse(new ArrayList<>()));
     }
 
     public ResponseEntity<AccountDto> fetchAccountById(Long id){
@@ -71,7 +86,7 @@ public class AccountService {
                                 .customerId(0)
                                 .build()
                 );
-        Optional<List<CardDto>> cards = cardService.findAllCardsByAccountId(accountId);
+        Optional<List<CardDto>> cards = cardService.cardListToDto(account.getCards());
 
         return AccountCardsDto.builder()
                 .iban(account.getIban())
@@ -102,7 +117,7 @@ public class AccountService {
         accountDto.setId(account.getId());
         accountDto.setIban(account.getIban());
         accountDto.setBankCode(account.getBankCode());
-        accountDto.setCustomerId(account.getCustomerId());
+        accountDto.setCustomer(account.getCustomerId());
 
         return accountDto;
     }
@@ -112,7 +127,7 @@ public class AccountService {
         account.setId(accountDto.getId());
         account.setIban(accountDto.getIban());
         account.setBankCode(accountDto.getBankCode());
-        account.setCustomerId(accountDto.getCustomerId());
+        account.setCustomerId(accountDto.getCustomer());
 
         return account;
     }

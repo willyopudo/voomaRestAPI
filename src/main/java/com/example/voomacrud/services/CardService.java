@@ -7,18 +7,24 @@ import com.example.voomacrud.enums.CardType;
 import com.example.voomacrud.repository.AccountRepository;
 import com.example.voomacrud.repository.CardRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.example.voomacrud.util.specifications.AccountSpecification.*;
+import static com.example.voomacrud.util.specifications.CardSpecification.withAccountId;
+import static com.example.voomacrud.util.specifications.CardSpecification.withType;
 
 @Service
 public class CardService {
@@ -39,9 +45,15 @@ public class CardService {
         return ResponseEntity.ok(cardToCardDto(newCard));
     }
     // Get all cards
-    public Page<CardDto> fetchAllCards(int pageNo, int pageSize) {
+    public Page<CardDto> fetchAllCards(int pageNo, int pageSize, String cardType, List<String> accounts) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        return cardRepository.findAll(pageable).map(CardDto::new);
+
+        // Only create specifications for fields with values:
+        Specification<Card> filters = Specification.where(StringUtils.isBlank(cardType) ? null : withType(cardType))
+                .and(CollectionUtils.isEmpty(accounts) ? null : withAccountId(accounts));
+
+        // User our created Specification to query our repository
+        return cardRepository.findAll(filters,pageable).map(CardDto::new);
     }
 
     public ResponseEntity<Optional<CardDto>> fetchCardById(Long id){
@@ -76,7 +88,7 @@ public class CardService {
 		return cardListToDto(cardRepository.findAllByAccountId(accountId));
 
 	}
-    private CardDto cardToCardDto(Card card){
+    public CardDto cardToCardDto(Card card){
         CardDto cardDto = new CardDto();
         cardDto.setId(card.getId());
         cardDto.setCardAlias(card.getCardAlias());
@@ -95,7 +107,7 @@ public class CardService {
         return card;
     }
 
-    private Optional<List<CardDto>> cardListToDto(List<Card> cards){
+    public Optional<List<CardDto>> cardListToDto(List<Card> cards){
         return Optional.of(cards.stream().map(
 		        this::cardToCardDto).collect(Collectors.toList()));
 
