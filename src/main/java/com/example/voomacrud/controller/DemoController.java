@@ -29,7 +29,7 @@ public class DemoController {
     }
 
     @GetMapping("/transactions/{transactionId}")
-    public ResponseEntity<TsqResponseDto> getTransactionById(@PathVariable String transactionId,
+    public ResponseEntity<?> getTransactionById(@PathVariable String transactionId,
                                                              @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
         // Check if the Authorization header is present
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
@@ -39,7 +39,7 @@ public class DemoController {
         // Extract the token and validate it
         String token = authorizationHeader.substring(7); // Remove "Bearer " prefix
         if (!JWT_TOKEN.equals(token)) {
-            return ResponseEntity.status(403).body(null); // Forbidden
+            return ResponseEntity.status(403).body("Invalid Jwt token"); // Forbidden
         }
 
         // Simulate fetching a transaction by ID
