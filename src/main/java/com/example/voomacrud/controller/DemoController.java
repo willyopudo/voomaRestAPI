@@ -16,14 +16,20 @@ import java.time.LocalDateTime;
 public class DemoController {
     private final String JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30";
 
-    @PostMapping("/get-token")
-    public ResponseEntity<JwtTokenResponse> getToken(@RequestBody JwtTokenRequestDto tokenRequestDto) {
-        if(tokenRequestDto.clientId() == null || tokenRequestDto.clientSecret() == null) {
+    @PostMapping(value = "/get-token", consumes = "application/x-www-form-urlencoded")
+    public ResponseEntity<JwtTokenResponse> getToken(
+            @RequestParam("client_id") String clientId,
+            @RequestParam("client_secret") String clientSecret,
+            @RequestParam("grant_type") String grantType,
+            @RequestParam(value = "scope", required = false) String scope) {
+        if (clientId == null || clientSecret == null || grantType == null) {
             return ResponseEntity.badRequest().build();
         }
-        // Simulate token generation logic
+        if (!"client_credentials".equals(grantType)) {
+            return ResponseEntity.status(400).body(null); // Invalid grant_type
+        }
         String tokenType = "Bearer";
-        int expiresIn = 3600; // 1 hour in seconds
+        int expiresIn = 3600;
         JwtTokenResponse tokenResponse = new JwtTokenResponse(JWT_TOKEN, tokenType, expiresIn);
         return ResponseEntity.ok(tokenResponse);
     }

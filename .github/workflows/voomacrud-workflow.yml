@@ -76,22 +76,22 @@ jobs:
           file: Dockerfile
           push: true
           tags: willyf02/voomacrud:latest
-  deploy:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-latest
-    needs:
-      - docker-build
-    steps:
-      - name: Connect with SSH and Deploy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_KEY }}
-          script: |
-            cd /opt/voomacrud-test
-            docker compose pull && docker compose up -d
-            docker ps -a
+#  deploy:
+#    if: ${{ github.ref == 'refs/heads/main' }}
+#    runs-on: ubuntu-latest
+#    needs:
+#      - docker-build
+#    steps:
+#      - name: Connect with SSH and Deploy
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.SERVER_HOST }}
+#          username: ${{ secrets.SERVER_USER }}
+#          key: ${{ secrets.SERVER_KEY }}
+#          script: |
+#            cd /opt/voomacrud-test
+#            docker compose pull && docker compose up -d
+#            docker ps -a
 #    steps:
 #      - uses: actions/checkout@v3
 #      - name: Add Server key
